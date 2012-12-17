@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# imports OE BosToller file into DB, dropping and recreating tables
+
+# Drop and recreate the tables
+mysql -p oe_bostoll < ../sql/create.sql
+
+./import_oebostoller.pl < ../data/oe_bosworthtoller_utf8.txt | mysql -p oe_bostoll
+

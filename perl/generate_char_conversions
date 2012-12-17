@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#*****************************************************************************
+# generate_char_conversions
+#
+# Reads the file passed as argument and converts it to a Perl module that
+# will apply a series of substitutions to the string, assuming the input
+# file is of the format of the character database for the Germanic Lexicon 
+# Project.
+#
+# Note that it only generates encodings for characters which do have unicode
+# equivalencies specified.  Others, like &dash-uncertain; will be ignored.
+#*****************************************************************************
+
+if [ -f $1 ]; then
+	echo "package GermanicCharConversions; sub to_utf8 {"
+	echo '$line = shift;'
+	awk '/^U/ {print "$line =~ s/"$2"/"$1"/g;"}' $1 | sed "s/U\([[:xdigit:]]\{4\}\)+\?/\\\x\{\1\}/g"
+	echo 'return $line; } 1;'
+fi
+

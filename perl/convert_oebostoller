@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+# convert_oebostoller
+#
+# This is the top-level script for converting the Bosworth-Toller OE
+# dictionary to UTF-8 character set, by converting HTML entities like
+# &thorn; to their UTF-8 equivalent.
+# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+# generate the character conversion module
+./generate_char_conversions ../data/character_database.txt > ./GermanicCharConversions.pm
+
+# execute the Perl script with appropriate args
+./html_to_utf8_oe.pl < ../data/oe_bosworthtoller.txt >../data/oe_bosworthtoller_utf8.txt 
+
+
