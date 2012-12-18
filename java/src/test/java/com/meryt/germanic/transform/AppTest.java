@@ -1,6 +1,7 @@
 package com.meryt.germanic.transform;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /**
@@ -11,7 +12,7 @@ public class AppTest
     /**
      * Rigorous Test :-)
      */
-	@Test
+    @Test
     public void testTautology()
     {
         assertTrue( true );
