@@ -61,4 +61,12 @@ public class CharacterTest {
         assertEquals("m̄", ch.getUtf8Encoded());
     }
 
+    @Test
+    public void getUtf8EncodedReturnsEntityIfInvalidUnicode()
+    {
+        String tsvString = "-\t&thorn-bar;\tSJC\tN\tY\t\t\\thornbar{}";
+        Character ch = new Character(tsvString);
+        assertEquals("&thorn-bar;", ch.getUtf8Encoded());
+    }
+
 }

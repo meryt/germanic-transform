@@ -106,14 +106,23 @@ public class Character
 
     /**
      * Gets the value as a UTF-8 encoded character or series of characters.
+     *
+     * If the character is not a valid unicode character, returns the entity
+     * instead.  Anything else would lose information, and the non-unicode
+     * entries in the character database mostly don't have a reasonable
+     * ASCII transliteration in any case.
      */
     public String getUtf8Encoded()
     {
         // utf8Str is in the form "U0022" or "U0065+U0307+U0303"
         String[] utf8Parts = utf8Str.split("\\+");
         String accum = "";
-        for (String part : utf8Parts) {
-            accum += (char)(Integer.parseInt(part.substring(1), 16));
+        try {
+            for (String part : utf8Parts) {
+                accum += (char)(Integer.parseInt(part.substring(1), 16));
+            }
+        } catch (NumberFormatException e) {
+            return entityName;
         }
         return accum;
     }
