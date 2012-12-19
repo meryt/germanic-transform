@@ -3,6 +3,8 @@ package com.meryt.germanic.transform;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.meryt.germanic.transform.command.CharacterDatabaseCommand;
+
 /**
  * Hello world!
  *
@@ -40,7 +42,7 @@ public class App
                 return;
             }
             else if ("character-mappings".equals(command)) {
-                CharacterDatabase.main(remainingArgs);
+                CharacterDatabaseCommand.main(remainingArgs);
                 return;
             }
         } else {
@@ -66,7 +68,7 @@ public class App
     private static void showCommandHelp(String command)
     {
         if (command.equals("character-mappings")) {
-            CharacterDatabase.showHelp();
+            CharacterDatabaseCommand.showHelp();
             return;
         }
         System.out.println("Requested help for " + command);
