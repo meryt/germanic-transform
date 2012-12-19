@@ -104,6 +104,20 @@ public class Character
         strippedChar = parts[6];
     }
 
+    /**
+     * Gets the value as a UTF-8 encoded character or series of characters.
+     */
+    public String getUtf8Encoded()
+    {
+        // utf8Str is in the form "U0022" or "U0065+U0307+U0303"
+        String[] utf8Parts = utf8Str.split("\\+");
+        String accum = "";
+        for (String part : utf8Parts) {
+            accum += (char)(Integer.parseInt(part.substring(1), 16));
+        }
+        return accum;
+    }
+
     public String getCharacterClass() {
         return characterClass;
     }
