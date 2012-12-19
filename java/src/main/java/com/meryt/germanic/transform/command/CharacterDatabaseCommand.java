@@ -27,6 +27,7 @@ public class CharacterDatabaseCommand
         Options options = getOptions();
 
         String filePath = null;
+        boolean asUnicode = false;
         try {
             // parse the command line arguments
             CommandLine commandline = parser.parse(options, args);
@@ -35,6 +36,7 @@ public class CharacterDatabaseCommand
                 showHelp();
                 System.exit(1);
             }
+            asUnicode = commandline.hasOption("unicode");
         }
         catch( ParseException exp ) {
             System.err.println("Unexpected exception:" + exp.getMessage());
@@ -43,7 +45,7 @@ public class CharacterDatabaseCommand
 
         CharacterDatabase chardb = new CharacterDatabase(filePath);
         try {
-            HashMap<String, String> mappings = chardb.getSearchReplaceTokens();
+            HashMap<String, String> mappings = chardb.getSearchReplaceTokens(asUnicode);
             displayMappings(mappings);
         } catch (IOException e) {
             e.printStackTrace();
@@ -66,6 +68,8 @@ public class CharacterDatabaseCommand
         Options options = new Options();
         options.addOption("f", "file", true,
                 "path to the file containing character mappings (hint: character_database.txt");
+        options.addOption("u", "unicode", false,
+                "If set, will print mappings as Unicode rather than strings like 'U0064'");
         return options;
     }
 

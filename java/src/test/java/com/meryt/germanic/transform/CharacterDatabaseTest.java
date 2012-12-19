@@ -23,7 +23,7 @@ public class CharacterDatabaseTest
 
         HashMap<String,String> hm;
         try {
-            hm = db.getSearchReplaceTokens();
+            hm = db.getSearchReplaceTokens(false);
         } catch (IOException e) {
             fail("Should not throw an exception if we supply the lines");
             return;

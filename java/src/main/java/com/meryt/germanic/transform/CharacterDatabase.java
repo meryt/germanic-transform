@@ -49,7 +49,8 @@ public class CharacterDatabase
      * @return HashMap<String,String>
      * @throws IOException
      */
-    public HashMap<String,String> getSearchReplaceTokens() throws IOException
+    public HashMap<String,String> getSearchReplaceTokens(boolean asUnicode)
+        throws IOException
     {
         if (null != tokens) {
             return tokens;
@@ -65,7 +66,10 @@ public class CharacterDatabase
                 // Will throw exception if the line doesn't look right...
                 // TODO should we skip these maybe?
                 Character character = new Character(line);
-                tokens.put(character.getEntityName(), character.getUtf8Str());
+                tokens.put(character.getEntityName(),
+                    (asUnicode
+                        ? character.getUtf8Encoded()
+                        : character.getUtf8Str()));
             }
 
         }
