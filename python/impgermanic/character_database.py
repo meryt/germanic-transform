@@ -11,7 +11,7 @@ def get_character_translations(def_file = None):
     if not def_file:
         import os.path
         absroot = os.path.dirname(os.path.abspath(__file__))
-        def_file = os.path.join(absroot, '../../data/character_database.txt')
+        def_file = os.path.join(absroot, '../../../germanic-lexicon/character_database.txt')
     with open(def_file, mode='r', encoding='iso-8859-1') as dfile:
         # Get non-zero-length lines that aren't comments
         lines = [line for line in dfile if len(line.strip()) and line[0] != '#']
@@ -87,10 +87,7 @@ if __name__ == '__main__':
     str = 'U0061'
     assert(len(unicode_entry_to_unicode_chars(str)) == 1)
 
-    absroot = os.path.dirname(os.path.abspath(__file__))
-    char_def_file = os.path.join(absroot, '../../data/character_database.txt')
-    
-    lines = get_character_translations(char_def_file)
+    lines = get_character_translations(None)
     for line in lines:
         print(line)
     
