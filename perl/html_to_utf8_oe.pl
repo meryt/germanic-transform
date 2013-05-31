@@ -48,9 +48,9 @@ for my $line (<STDIN>) {
 		$line =~ s/&iactute;/\x{00ED}/g;
 		$line =~ s/&aleig-acute;/\x{01FD}/g;
 		$line =~ s/&dash-uncertain;/\x{2014}?/g; # em-dash plus question
-		$line =~ s/&thorn-bar;/\x{00FE}?/g; # just use reg. thorn
+		$line =~ s/&thorn-bar;/\x{00FE}/g; # just use reg. thorn
 		$line =~ s/&k-bar;/k/g; # just use reg. k
-		$line =~ s/&THORN-bar;/\x{00DE}?/g; # just use reg. thorn
+		$line =~ s/&THORN-bar;/\x{00DE}/g; # just use reg. thorn
 		$line =~ s/&thron;/\x{00FE}/g;
 		$line =~ s/&ealig;/\x{00E6}/g;  # I assume this is an error
 		$line =~ s/&alig;/\x{00E6}/g;  # I assume this is an error
