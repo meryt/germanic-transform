@@ -1,0 +1,15 @@
+apply plugin: 'base'
+
+task htmlToUtf8 {
+    ext.srcFile = file('../../germanic-lexicon/oe-bosworthtoller/oe_bosworthtoller.txt')
+    ext.destFile = new File(buildDir, 'oe_bosworthtoller.utf8.txt')
+    inputs.file srcFile
+    outputs.file destFile
+    doLast {
+        copy {
+            from srcFile
+            into destFile
+        }
+    }
+}
+

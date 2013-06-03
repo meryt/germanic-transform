@@ -1,3 +1,5 @@
+gradle/.gradle
+gradle/build
 java/.classpath
 java/.project
 java/.settings
