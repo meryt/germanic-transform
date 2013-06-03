@@ -1,15 +1,32 @@
 apply plugin: 'base'
 
-task htmlToUtf8 {
+task generateCharacterMappings(type: Exec) {
+    ext.srcFile = file('../../germanic-lexicon/character_database.txt')
+    ext.srcExec = file('../python/impgermanic/character_database.py')
+    ext.destFile = new File(buildDir, 'character_mappings.txt')
+    inputs.file srcFile
+    inputs.file srcExec
+    outputs.file destFile
+    
+    buildDir.mkdirs()
+
+    commandLine srcExec, '-f', srcFile, '-o', destFile
+}
+
+task htmlToUtf8(dependsOn: generateCharacterMappings) {
     ext.srcFile = file('../../germanic-lexicon/oe-bosworthtoller/oe_bosworthtoller.txt')
+    ext.scriptFile = file('../python/oe-bosworthtoller/oe_bosworthtoller.txt')
     ext.destFile = new File(buildDir, 'oe_bosworthtoller.utf8.txt')
     inputs.file srcFile
+    inputs.file scriptFile 
     outputs.file destFile
     doLast {
+        
         copy {
             from srcFile
             into destFile
         }
+        
     }
 }
 
