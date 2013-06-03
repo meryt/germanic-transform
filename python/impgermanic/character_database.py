@@ -74,8 +74,19 @@ def unicode_entry_to_unicode_chars(unicode_entry):
 
     return unicode_str
 
+def write_mappings_file(chars, output_file=None):
+    '''Writes the converted character mapping to a file or stdout'''
+    if output_file is not None:        
+        with open(output_file, mode='w', encoding='utf-8') as outf:
+            for tuple in chars:
+                outf.write(tuple[0] + "\t" + tuple[1] + "\n")
+    else:
+        import sys
+        with sys.stdout as outf:
+            for tuple in chars:
+                outf.write(tuple[0] + "\t" + tuple[1] + "\n")
 
-if __name__ == '__main__':
+def _test():
     '''Test on the character database'''
     import os.path
 
@@ -89,6 +100,22 @@ if __name__ == '__main__':
 
     lines = get_character_translations(None)
     for line in lines:
-        print(line)
-    
+        print(line)    
+
+if __name__ == '__main__':
+    import argparse
+    import os.path
+    absroot = os.path.dirname(os.path.abspath(__file__))
+    def_input_file = os.path.join(absroot, '../../../germanic-lexicon/character_database.txt')
+
+    parser = argparse.ArgumentParser(description='Generate the character database')
+    parser.add_argument('-t', '--test', action='store_true', help='run the unit test and exit')
+    parser.add_argument('-f', '--file', default=def_input_file, help='the file containing the ASCII input character database')
+    parser.add_argument('-o', '--output', help='the file where the UTF-8 mappings will be stored')
+    args = parser.parse_args()
+
+    if (args.test):
+        _test()
+    else:
+        write_mappings_file(get_character_translations(args.file), args.output)
 
