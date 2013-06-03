@@ -86,6 +86,19 @@ def write_mappings_file(chars, output_file=None):
             for tuple in chars:
                 outf.write(tuple[0] + "\t" + tuple[1] + "\n")
 
+def read_mappings_file(input_file):
+    '''Reads the converted character mapping from a file and returns as a list of tuples'''
+    chars = []
+    with open(input_file, mode='r', encoding='utf-8') as dfile:
+        for line in dfile:
+            # Split on whitespace
+            fields = line.split("\t")
+            if len(fields) == 2:
+                chars.append((fields[0], fields[1]))
+            else:
+                raise InvalidCharacterDatabaseError("Invalid mapping file line: " + line)
+    return chars
+
 def _test():
     '''Test on the character database'''
     import os.path
