@@ -4,4 +4,7 @@ java/.classpath
 java/.project
 java/.settings
 java/target
+python/impgermanic/.project
+python/impgermanic/.pydevproject
+python/impgermanic/__pycache__
 
