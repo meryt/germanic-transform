@@ -25,3 +25,14 @@ task htmlToUtf8(dependsOn: generateCharacterMappings, type: Exec) {
     commandLine scriptFile, '-f', srcFile, '-o', destFile, '-m', mappingFile 
 }
 
+task generateMysql(dependsOn: htmlToUtf8, type: Exec) {
+    ext.srcFile = new File(buildDir, 'oe_bosworthtoller.utf8.txt')
+    ext.scriptFile = file('../python/impgermanic/to_sql.py')
+    ext.destFile = new File(buildDir, 'oe_bosworthtoller.sql')
+
+    inputs.file srcFile
+    inputs.file scriptFile
+    outputs.file destFile
+
+    commandLine scriptFile, '-f', srcFile, '-o', destFile
+}
