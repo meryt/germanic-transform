@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
     infileDescriptor = sys.stdin.fileno() if args.file == '-' else args.file
 
-    with (open(infileDescriptor, 'r', encoding='utf-8')) as infile:
+    with (open(infileDescriptor, 'r', encoding='iso-8859-1')) as infile:
         with (sys.stdout if args.output == None else open(args.output, mode='w', encoding='utf-8')) as outfile:
             filter = Utf8izer(args.mappings)
             for line in infile:
