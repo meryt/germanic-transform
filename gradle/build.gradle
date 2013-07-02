@@ -10,23 +10,18 @@ task generateCharacterMappings(type: Exec) {
     
     buildDir.mkdirs()
 
-    commandLine srcExec, '-f', srcFile, '-o', destFile
+    commandLine srcExec, '-o', destFile, srcFile
 }
 
-task htmlToUtf8(dependsOn: generateCharacterMappings) {
+task htmlToUtf8(dependsOn: generateCharacterMappings, type: Exec) {
     ext.srcFile = file('../../germanic-lexicon/oe-bosworthtoller/oe_bosworthtoller.txt')
-    ext.scriptFile = file('../python/oe-bosworthtoller/oe_bosworthtoller.txt')
+    ext.scriptFile = file('../python/impgermanic/utf8izer.py')
+    ext.mappingFile = new File(buildDir, 'character_mappings.txt')
     ext.destFile = new File(buildDir, 'oe_bosworthtoller.utf8.txt')
     inputs.file srcFile
-    inputs.file scriptFile 
+    inputs.file scriptFile
     outputs.file destFile
-    doLast {
-        
-        copy {
-            from srcFile
-            into destFile
-        }
-        
-    }
+
+    commandLine scriptFile, '-f', srcFile, '-o', destFile, '-m', mappingFile 
 }
 
