@@ -226,7 +226,7 @@ def debug_write(str):
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description='Converts a UTF-8-encoded lexicon file into some database format (currently MySQL Dump)')
+    parser = argparse.ArgumentParser(description='Converts a UTF-8-encoded lexicon file into some database format (by default MySQL Dump)')
     parser.add_argument('-t', '--type', default="mysql", help='the format of the output file -- accepts "mysql" and "sqlite"')
     parser.add_argument('-f', '--file', default="-", help='the input file containing the lexicon to be converted, or nothing or - for stdin')
     parser.add_argument('-o', '--output', help='the output file, or stdout if not provided')
