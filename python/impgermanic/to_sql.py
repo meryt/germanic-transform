@@ -13,7 +13,7 @@ class ParseError(Exception):
 
 class DataConverter():
 
-    def convert(self, infile, dataWriter):
+    def convert(self, infile, dataWriter, include_raw):
         '''Convert an input text file to some database format.
 
         args:
@@ -133,10 +133,11 @@ class DataConverter():
 
 class DataWriter():
 
-    def __init__(self, outfile):
+    def __init__(self, outfile, include_raw):
         self.headers = []
         self.entries = []
         self.outfile = outfile
+        self.include_raw = include_raw
 
     def write_header(self, header_line, page_id, line_num):
         self.headers.append("('{0}', '{1}', '{2}')"
@@ -144,13 +145,22 @@ class DataWriter():
         #debug_write("New header " + header_line)
 
     def write_entry(self, entry):
-        self.entries.append("('{0}', '{1}', '{2}', '{3}', '{4}')".format(
-            self.sql_escape(entry['cur_entry_page']),
-            self.sql_escape(entry['cur_entry']),
-            self.sql_escape(entry['cur_entry_raw']),
-            self.sql_escape(entry['cur_entry_text']),
-            self.sql_escape(','.join(entry['cur_entry_line']))
-         ))
+
+        if (self.include_raw):
+            self.entries.append("('{0}', '{1}', '{2}', '{3}', '{4}')".format(
+                self.sql_escape(entry['cur_entry_page']),
+                self.sql_escape(entry['cur_entry']),
+                self.sql_escape(entry['cur_entry_raw']),
+                self.sql_escape(entry['cur_entry_text']),
+                self.sql_escape(','.join(entry['cur_entry_line']))
+             ))
+        else:
+            self.entries.append("('{0}', '{1}', '{2}', '{3}')".format(
+                self.sql_escape(entry['cur_entry_page']),
+                self.sql_escape(entry['cur_entry']),
+                self.sql_escape(entry['cur_entry_text']),
+                self.sql_escape(','.join(entry['cur_entry_line']))
+             ))
         entry['cur_entry_text'] = ''
         entry['cur_entry_raw'] = ''
         #debug_write("Wrote entry " + entry['cur_entry'] + "\n")
@@ -172,7 +182,10 @@ class DataWriter():
         outf.write('INSERT INTO pages (id, header, line_num) VALUES\n')
         outf.write(",\n".join(self.headers) + ";\n\n")
 
-        outf.write("INSERT INTO entries (page_id, headword, entry_raw, entry, line_num) VALUES\n")
+        if (self.include_raw):
+            outf.write("INSERT INTO entries (page_id, headword, entry_raw, entry, line_num) VALUES\n")
+        else:
+            outf.write("INSERT INTO entries (page_id, headword, entry, line_num) VALUES\n")
         outf.write(",\n".join(self.entries) + ";\n\n")
 
     def sql_escape(self, st):
@@ -191,13 +204,20 @@ class SqliteWriter(DataWriter):
             pass
         self.db = sqlite3.connect(self.outfile)
         c = self.db.cursor()
-        c.execute('''CREATE TABLE pages (id INT PRIMARY KEY, header TEXT, line_num TEXT)''');
-        c.execute('''CREATE TABLE entries (page_id INT, headword TEXT, entry_raw TEXT, entry TEXT, line_num TEXT)''');
+        c.execute('''CREATE TABLE pages (id INT PRIMARY KEY, header TEXT, line_num TEXT)''')
+        if (self.include_raw):
+            c.execute('''CREATE TABLE entries (page_id INT, headword TEXT, entry_raw TEXT, entry TEXT, line_num TEXT)''')
+        else:
+            c.execute('''CREATE TABLE entries (page_id INT, headword TEXT, entry TEXT, line_num TEXT)''')
         self.db.commit()
 
     def write_entry(self, entry):
         # Create a new dictionary using only the keys we are interested in, and append it to the entries list
-        self.entries.append({k:entry[k] for k in ['cur_entry_page', 'cur_entry', 'cur_entry_raw', 'cur_entry_text', 'cur_entry_line']})
+        if (self.include_raw):
+            keys = ['cur_entry_page', 'cur_entry', 'cur_entry_raw', 'cur_entry_text', 'cur_entry_line']
+        else:
+            keys = ['cur_entry_page', 'cur_entry', 'cur_entry_text', 'cur_entry_line']
+        self.entries.append({k:entry[k] for k in keys})
         entry['cur_entry_text'] = ''
         entry['cur_entry_raw'] = ''
 
@@ -210,8 +230,12 @@ class SqliteWriter(DataWriter):
         for chunk in self.chunk_headers(100):
             c.execute('''INSERT INTO pages (id, header, line_num) VALUES ''' + ','.join(chunk))
         for entry in self.entries:
-            params = (entry['cur_entry_page'], entry['cur_entry'], entry['cur_entry_raw'], entry['cur_entry_text'], ','.join(entry['cur_entry_line']))
-            c.execute('''INSERT INTO entries (page_id, headword, entry_raw, entry, line_num) VALUES (?, ?, ?, ?, ?)''', params)
+            if (self.include_raw):
+                params = (entry['cur_entry_page'], entry['cur_entry'], entry['cur_entry_raw'], entry['cur_entry_text'], ','.join(entry['cur_entry_line']))
+                c.execute('''INSERT INTO entries (page_id, headword, entry_raw, entry, line_num) VALUES (?, ?, ?, ?, ?)''', params)
+            else:
+                params = (entry['cur_entry_page'], entry['cur_entry'], entry['cur_entry_text'], ','.join(entry['cur_entry_line']))
+                c.execute('''INSERT INTO entries (page_id, headword, entry, line_num) VALUES (?, ?, ?, ?)''', params)
         self.db.commit()
 
     def chunk_headers(self, chunk_size):
@@ -230,17 +254,18 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--type', default="mysql", help='the format of the output file -- accepts "mysql" and "sqlite"')
     parser.add_argument('-f', '--file', default="-", help='the input file containing the lexicon to be converted, or nothing or - for stdin')
     parser.add_argument('-o', '--output', help='the output file, or stdout if not provided')
+    parser.add_argument('-r', '--raw', action='store_true', help='include the raw text as well as the HTMLified')
     args = parser.parse_args()
 
     converter = DataConverter()
     infileDescriptor = sys.stdin.fileno() if args.file == '-' else args.file
 
     if (args.type.lower() == 'sqlite'):
-        writer = SqliteWriter(args.output)
+        writer = SqliteWriter(args.output, args.raw)
         with (open(infileDescriptor, 'r', encoding='utf-8')) as infile:
                 #pr = cProfile.Profile()
                 #pr.enable()
-                converter.convert(infile, writer)
+                converter.convert(infile, writer, args.raw)
                 #pr.disable()
 
                 #s = io.StringIO()
@@ -252,9 +277,9 @@ if __name__ == '__main__':
         outfileDescriptor = sys.stdout.fileno() if args.output == None else args.output
         with (open(infileDescriptor, 'r', encoding='utf-8')) as infile:
             with open(outfileDescriptor, mode='w', encoding='utf-8') as outf:
-                writer = MysqlWriter(outf)
+                writer = MysqlWriter(outf, args.raw)
                 try:
-                    converter.convert(infile, writer)
+                    converter.convert(infile, writer, args.raw)
                 except ParseError as e:
                     sys.stdout.write(e.args[0])
                     exit(1)
