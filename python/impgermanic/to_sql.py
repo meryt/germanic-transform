@@ -204,11 +204,11 @@ class SqliteWriter(DataWriter):
             pass
         self.db = sqlite3.connect(self.outfile)
         c = self.db.cursor()
-        c.execute('''CREATE TABLE pages (id INT PRIMARY KEY, header TEXT, line_num TEXT)''')
+        c.execute('''CREATE TABLE pages (id TEXT PRIMARY KEY, header TEXT, line_num TEXT)''')
         if (self.include_raw):
-            c.execute('''CREATE TABLE entries (page_id INT, headword TEXT, entry_raw TEXT, entry TEXT, line_num TEXT)''')
+            c.execute('''CREATE TABLE entries (page_id TEXT, headword TEXT, entry_raw TEXT, entry TEXT, line_num TEXT)''')
         else:
-            c.execute('''CREATE TABLE entries (page_id INT, headword TEXT, entry TEXT, line_num TEXT)''')
+            c.execute('''CREATE TABLE entries (page_id TEXT, headword TEXT, entry TEXT, line_num TEXT)''')
         self.db.commit()
 
     def write_entry(self, entry):
