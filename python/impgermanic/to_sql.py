@@ -209,6 +209,8 @@ class SqliteWriter(DataWriter):
             c.execute('''CREATE TABLE entries (page_id TEXT, headword TEXT, entry_raw TEXT, entry TEXT, line_num TEXT)''')
         else:
             c.execute('''CREATE TABLE entries (page_id TEXT, headword TEXT, entry TEXT, line_num TEXT)''')
+
+        c.execute('''CREATE INDEX IF NOT EXISTS idx_entries_page_id ON entries(page_id)''')
         self.db.commit()
 
     def write_entry(self, entry):
